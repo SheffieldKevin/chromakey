@@ -27,13 +27,15 @@ NSString *const YVSChromaKeyFilterString = SHADER_STRING
   {
     vec4 outputColor;
     vec4 foregroundColor = sample(inputImage, samplerCoord(inputImage));
-      
+    foregroundColor = unpremultiply(foregroundColor);
     float meanr = ((foregroundColor.r + inputColor.r) / 8.0);
     float dist = distance(normalizeColor(foregroundColor.rgb, meanr),
                         normalizeColor(inputColor.rgb, meanr));
       // float dist = distance(foregroundColor.rgb, inputColor.rgb);
     float alpha = smoothstep(inputDistance, inputDistance + inputSlope, dist);
-    outputColor = foregroundColor * alpha;
+    outputColor.a = foregroundColor.a * alpha;
+    outputColor.rgb = foregroundColor.rgb;
+    outputColor = premultiply(outputColor);
     return outputColor;
   }
 );

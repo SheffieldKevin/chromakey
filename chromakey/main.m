@@ -243,7 +243,7 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
     {
         [filter setValue:self.slopeWidth forKey:@"inputSlopeWidth"];
     }
-    NSLog(@"Attributes %@", [[filter attributes] description]);
+    // NSLog(@"Attributes %@", [[filter attributes] description]);
     
     // OK we need to create a CGContext to draw into.
     size_t imageWidth = CGImageGetWidth(image);

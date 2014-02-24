@@ -17,10 +17,10 @@
 
 NSString *const YVSChromaKeyFilterString = SHADER_STRING
 (
-  vec3 normalizeColor(vec3 color, float meanr)
-  {
-	return (color * vec3(0.75 + meanr, 1.0, 1.0 - meanr));
-  }
+ //  vec3 normalizeColor(vec3 color, float meanr)
+ // {
+ //	return (color * vec3(0.75 + meanr, 1.0, 1.0 - meanr));
+ // }
  
   kernel vec4 apply(sampler inputImage, vec4 inputColor,
                     float inputDistance, float inputSlope)
@@ -28,10 +28,10 @@ NSString *const YVSChromaKeyFilterString = SHADER_STRING
     vec4 outputColor;
     vec4 foregroundColor = sample(inputImage, samplerCoord(inputImage));
     foregroundColor = unpremultiply(foregroundColor);
-    float meanr = ((foregroundColor.r + inputColor.r) / 8.0);
-    float dist = distance(normalizeColor(foregroundColor.rgb, meanr),
-                        normalizeColor(inputColor.rgb, meanr));
-      // float dist = distance(foregroundColor.rgb, inputColor.rgb);
+      // float meanr = ((foregroundColor.r + inputColor.r) / 8.0);
+      // float dist = distance(normalizeColor(foregroundColor.rgb, meanr),
+      //                  normalizeColor(inputColor.rgb, meanr));
+    float dist = distance(foregroundColor.rgb, inputColor.rgb);
     float alpha = smoothstep(inputDistance, inputDistance + inputSlope, dist);
     outputColor.a = foregroundColor.a * alpha;
     outputColor.rgb = foregroundColor.rgb;
@@ -58,8 +58,8 @@ static CIKernel *chromaKeyKernel;
                                                                         Y:1.0f
                                                                         Z:0.0f
                                                                         W:1.0];
-        YVSChromaKeyFilterDefaultInputDistance = @0.8;
-        YVSChromaKeyFilterDefaultInputSlopeWidth = @0.6;
+        YVSChromaKeyFilterDefaultInputDistance = @0.08;
+        YVSChromaKeyFilterDefaultInputSlopeWidth = @0.06;
         
         [CIFilter registerFilterName:@"YVSChromaKeyFilter"
                          constructor:(id<CIFilterConstructor>)self
@@ -120,13 +120,12 @@ static CIKernel *chromaKeyKernel;
 
 - (NSDictionary *)customAttributes
 {
-    NSDictionary *inputColorProps;
-    inputColorProps = @{ kCIAttributeClass : [CIColor class],
-                       kCIAttributeDefault : YVSChromaKeyFilterDefaultInputColor,
-                          kCIAttributeType : kCIAttributeTypeOpaqueColor };
+    NSDictionary *inputColorProps = @{
+                     kCIAttributeClass : [CIColor class],
+                   kCIAttributeDefault : YVSChromaKeyFilterDefaultInputColor,
+                      kCIAttributeType : kCIAttributeTypeOpaqueColor };
     
-    NSDictionary *inputDistanceProps;
-    inputDistanceProps = @{
+    NSDictionary *inputDistanceProps = @{
                      kCIAttributeClass : [NSNumber class],
                    kCIAttributeDefault : YVSChromaKeyFilterDefaultInputDistance,
                       kCIAttributeType : kCIAttributeTypeDistance };
@@ -136,7 +135,7 @@ static CIKernel *chromaKeyKernel;
                   kCIAttributeDefault : YVSChromaKeyFilterDefaultInputSlopeWidth,
                      kCIAttributeType : kCIAttributeTypeDistance };
 
-	return @{ kCIInputColorKey : inputColor,
+	return @{ kCIInputColorKey : inputColorProps,
               @"inputDistance" : inputDistanceProps,
             @"inputSlopeWidth" : inputSlopeWidthProps };
 }

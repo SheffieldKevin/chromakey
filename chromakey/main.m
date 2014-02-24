@@ -27,6 +27,9 @@
 //		AVExporter Class Interface
 // ---------------------------------------------------------------------------
 @interface YVSChromaKeyImageProcessor : NSObject
+{
+    CGContextRef cgContext;
+}
 
 @property (nonatomic, strong) NSString *programName;
 @property (nonatomic, strong) NSString *exportType; // hard coded to png or tiff
@@ -37,11 +40,15 @@
 @property (nonatomic, strong) NSString *blueColour;
 @property (nonatomic, strong) CIVector *ciColourVector;
 @property (nonatomic, strong) NSURL *sourcePath;
+@property (nonatomic, assign, getter = isSourceDirectory) BOOL sourceDirectory;
 @property (nonatomic, strong) NSURL *destinationFolder;
+@property (nonatomic, strong) CIContext *ciContext;
+@property (nonatomic, assign) CGContextRef cgContext; // Really retain.
 
-- (id)initWithArgs:(int)argc argv:(const char **)argv;
-- (void)printUsage;
-- (int)run;
+-(id)initWithArgs:(int)argc argv:(const char **)argv;
+-(void)printUsage;
+-(int)processFile:(NSURL *)fileURL;
+-(int)run;
 
 @end
 
@@ -61,7 +68,37 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
     return gotValue;
 }
 
+void DrawTransparentBlackToContext(CGContextRef context, size_t width,
+                                   size_t height)
+{
+    // Now redraw to the context with transparent black.
+    CGContextSaveGState(context);
+    CGColorRef tBlack = CGColorCreateGenericRGB(0.0, 0.0, 0.0, 0.0);
+    // CGColorGetConstantColor(kCGColorWhite);
+    CGContextSetBlendMode(context, kCGBlendModeCopy);
+    CGContextSetFillColorWithColor(context, tBlack);
+    CGRect theRect = CGRectMake(0.0, 0.0, width, height);
+    CGContextFillRect(context, theRect);
+    CGContextRestoreGState(context);
+}
+
 @implementation YVSChromaKeyImageProcessor
+
+-(void)setCgContext:(CGContextRef)theCgContext
+{
+    if (self.cgContext)
+        CGContextRelease(self.cgContext);
+    
+    if (theCgContext)
+        CGContextRetain(theCgContext);
+    
+    self->cgContext = theCgContext;
+}
+
+-(CGContextRef)cgContext
+{
+    return self->cgContext;
+}
 
 -(instancetype)initWithArgs:(int)argc argv:(const char **)argv
 {
@@ -90,9 +127,15 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
             {
                 NSString *sourcePath = @(*argv++);
                 sourcePath = [sourcePath stringByExpandingTildeInPath];
-                self.sourcePath = [[NSURL alloc] initFileURLWithPath:sourcePath];
-                if (self.sourcePath)
+                BOOL isDir, fsObjectExists;
+                fsObjectExists = [[NSFileManager defaultManager]
+                                  fileExistsAtPath:sourcePath
+                                  isDirectory:&isDir];
+                if (fsObjectExists)
                 {
+                    NSURL *url = [[NSURL alloc] initFileURLWithPath:sourcePath];
+                    self.sourcePath = url;
+                    self.sourceDirectory = isDir;
                     gotSource = YES;
                 }
                 argc--;
@@ -187,14 +230,52 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
     printf("To be implemented\n");
 }
 
--(int)run
+-(CGContextRef)getCGContextWithWidth:(size_t)width height:(size_t)height
+{
+    CGContextRef origContext = self.cgContext;
+    if (origContext)
+    {
+        size_t origWidth = CGBitmapContextGetWidth(origContext);
+        size_t origHeight = CGBitmapContextGetHeight(origContext);
+        if (origWidth == width && origHeight == height)
+        {
+            // Now redraw to the context with solid white.
+            DrawTransparentBlackToContext(origContext, width, height);
+            return origContext;
+        }
+        self.cgContext = nil;
+    }
+    size_t bytesPerRow = width * 4;
+    if (bytesPerRow % 16)
+        bytesPerRow += 16 - (bytesPerRow % 16);
+    
+    CGColorSpaceRef colorSpace;
+    // colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
+    colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+    CGContextRef context = CGBitmapContextCreate(NULL, width, height,
+                                                 8, bytesPerRow, colorSpace,
+                                (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    self.cgContext = context;
+    
+    // Now draw to the context with solid white. Remove any old alpha value.
+    DrawTransparentBlackToContext(context, width, height);
+
+    NSDictionary *ciContextOptions;
+    ciContextOptions = @{ kCIContextWorkingColorSpace : (__bridge id)colorSpace };
+    self.ciContext = [CIContext contextWithCGContext:self.cgContext
+                                                   options:ciContextOptions];
+    CFRelease(colorSpace);
+    CGContextRelease(context);
+    return self.cgContext;
+}
+
+-(int)processFile:(NSURL *)fileURL
 {
     int result = 0;
     
     // Create the image importer, and exit on failure.
-    CGImageSourceRef imageSource = CGImageSourceCreateWithURL(
-                                        (__bridge CFURLRef)self.sourcePath,
-                                        nil);
+    CGImageSourceRef imageSource;
+    imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)fileURL, nil);
     if (!(imageSource && CGImageSourceGetCount(imageSource)))
     {
         result = -2;
@@ -213,23 +294,21 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
         result = -3;
         return result;
     }
-    
-    // Create the directory where the new file is to be created if the
-    // directory does not already exist.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager createDirectoryAtURL:self.destinationFolder
-      withIntermediateDirectories:YES attributes:nil error:nil];
-    
-    // Create the full path to the file to be created.
-    NSString *fileName = [self.sourcePath lastPathComponent];
+
+    // Build the path to the file to be created.
+    NSString *fileName = [fileURL lastPathComponent];
     fileName = [fileName stringByDeletingPathExtension];
     fileName = [fileName stringByAppendingPathExtension:@"png"];
     NSURL *outURL = [self.destinationFolder URLByAppendingPathComponent:fileName];
     
-    // Now set up the filter to be used.
-    [YVSChromaKeyFilter class];
+    // Get an already created graphic context or create a new one if necessary.
+    size_t imageWidth = CGImageGetWidth(image);
+    size_t imageHeight = CGImageGetHeight(image);
+    CGContextRef context;
+    context = [self getCGContextWithWidth:imageWidth height:imageHeight];
+
+    // Create the chroma key filter and set values.
     CIFilter *filter = [CIFilter filterWithName:@"YVSChromaKeyFilter"];
-    //    NSLog(@"Filter attributes: %@", [[filter attributes] description]);
     [filter setValue:self.ciColourVector forKey:@"inputColor"];
     CIImage *inCIImage = [CIImage imageWithCGImage:image];
     CGImageRelease(image);
@@ -243,44 +322,62 @@ BOOL GetCGFloatFromString(NSString *string, CGFloat *value)
     {
         [filter setValue:self.slopeWidth forKey:@"inputSlopeWidth"];
     }
-    // NSLog(@"Attributes %@", [[filter attributes] description]);
-    
-    // OK we need to create a CGContext to draw into.
-    size_t imageWidth = CGImageGetWidth(image);
-    size_t imageHeight = CGImageGetHeight(image);
-    size_t bytesPerRow = imageWidth * 4;
-    if (bytesPerRow % 16)
-        bytesPerRow += 16 - (bytesPerRow % 16);
 
-    CGColorSpaceRef colorSpace;
-    // colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
-    colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
-    CGContextRef context = CGBitmapContextCreate(NULL, imageWidth, imageHeight,
-                                                 8, bytesPerRow, colorSpace,
-                                    (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
-
-    // CGContext created, now create the ci context.
-    NSDictionary *ciContextOptions;
-    ciContextOptions = @{ kCIContextWorkingColorSpace : (__bridge id)colorSpace };
-    CIContext *ciContext = [CIContext contextWithCGContext:context
-                                                   options:ciContextOptions];
-    CGRect inOutRect = CGRectMake(0.0, 0.0,
-                                  (CGFloat)imageWidth, (CGFloat)imageHeight);
-    
     // Get the CIImage from the filter.
     CIImage *outImage = [filter valueForKey:kCIOutputImageKey];
-    [ciContext drawImage:outImage inRect:inOutRect fromRect:inOutRect];
+    CGRect inOutRect = CGRectMake(0.0, 0.0,
+                                  (CGFloat)imageWidth, (CGFloat)imageHeight);
+    [self.ciContext drawImage:outImage inRect:inOutRect fromRect:inOutRect];
     
     // The image should be in my context now, so I should create image from context
     CGImageRef outCGImage = CGBitmapContextCreateImage(context);
     CGImageDestinationRef exporter = CGImageDestinationCreateWithURL(
-                                            (__bridge CFURLRef)outURL,
-                                            (__bridge CFStringRef)self.exportType,
-                                                                     1, NULL);
+                                         (__bridge CFURLRef)outURL,
+                                         (__bridge CFStringRef)self.exportType,
+                                         1, NULL);
     CGImageDestinationAddImage(exporter, outCGImage, nil);
     CGImageDestinationFinalize(exporter);
     CGImageRelease(outCGImage);
     CFRelease(exporter);
+
+    return result;
+}
+
+-(int)run
+{
+    int result = 0;
+
+    // Set up the filter to be used.
+    [YVSChromaKeyFilter class];
+
+    // Create the directory where the new files are to be created if the
+    // directory does not already exist.
+    NSFileManager *manager = [NSFileManager defaultManager];
+    [manager createDirectoryAtURL:self.destinationFolder
+      withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    if (self.isSourceDirectory)
+    {
+        NSArray *filesInDir = [manager contentsOfDirectoryAtURL:self.sourcePath
+                                     includingPropertiesForKeys:nil
+                                options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                          error:nil];
+        if (filesInDir)
+        {
+            for (NSURL *fileURL in filesInDir)
+            {
+                // ignore result of processing file. Just because one file
+                // couldn't be processed doesn't mean the next can't.
+                [self processFile:fileURL];
+            }
+        }
+    }
+    else
+    {
+        [self processFile:self.sourcePath];
+    }
+    self.cgContext = nil;
+    self.ciContext = nil;
     return result;
 }
 

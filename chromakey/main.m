@@ -43,10 +43,13 @@
 @property (nonatomic, assign, getter = isSourceDirectory) BOOL sourceDirectory;
 @property (nonatomic, strong) NSURL *destinationFolder;
 @property (nonatomic, strong) CIContext *ciContext;
+@property (nonatomic, strong) CIFilter *ciFilter;
 @property (nonatomic, assign) CGContextRef cgContext; // Really retain.
 
 -(id)initWithArgs:(int)argc argv:(const char **)argv;
 -(void)printUsage;
+-(CIFilter *)createCIFilter;
+-(CGContextRef)getCGContextWithWidth:(size_t)width height:(size_t)height;
 -(int)processFile:(NSURL *)fileURL;
 -(int)run;
 
@@ -269,6 +272,24 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     return self.cgContext;
 }
 
+-(CIFilter *)createCIFilter
+{
+    // Create the chroma key filter and set values.
+    CIFilter *filter = [CIFilter filterWithName:@"YVSChromaKeyFilter"];
+    [filter setValue:self.ciColourVector forKey:@"inputColor"];
+    [filter setValue:self.ciColourVector forKey:@"inputColor"];
+    if (self.distance)
+    {
+        [filter setValue:self.distance forKey:@"inputDistance"];
+    }
+    if (self.slopeWidth)
+    {
+        [filter setValue:self.slopeWidth forKey:@"inputSlopeWidth"];
+    }
+
+    return filter;
+}
+
 -(int)processFile:(NSURL *)fileURL
 {
     int result = 0;
@@ -307,21 +328,16 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     CGContextRef context;
     context = [self getCGContextWithWidth:imageWidth height:imageHeight];
 
-    // Create the chroma key filter and set values.
-    CIFilter *filter = [CIFilter filterWithName:@"YVSChromaKeyFilter"];
-    [filter setValue:self.ciColourVector forKey:@"inputColor"];
+    // Obtain the filter, the createCIFilter sets values except input image.
+    if (!self.ciFilter)
+    {
+        self.ciFilter = [self createCIFilter];
+    }
+    CIFilter *filter = self.ciFilter;
+
     CIImage *inCIImage = [CIImage imageWithCGImage:image];
-    CGImageRelease(image);
     [filter setValue:inCIImage forKey:kCIInputImageKey];
-    [filter setValue:self.ciColourVector forKey:@"inputColor"];
-    if (self.distance)
-    {
-        [filter setValue:self.distance forKey:@"inputDistance"];
-    }
-    if (self.slopeWidth)
-    {
-        [filter setValue:self.slopeWidth forKey:@"inputSlopeWidth"];
-    }
+    CGImageRelease(image);
 
     // Get the CIImage from the filter.
     CIImage *outImage = [filter valueForKey:kCIOutputImageKey];

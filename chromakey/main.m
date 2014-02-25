@@ -80,6 +80,15 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     CGContextRestoreGState(context);
 }
 
+CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
+{
+    if (in > max)
+        return max;
+    if (in < min)
+        return min;
+    return in;
+}
+
 @implementation YVSChromaKeyImageProcessor
 
 -(void)setCgContext:(CGContextRef)theCgContext
@@ -170,6 +179,7 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
                     BOOL gotDistance = GetCGFloatFromString(distance, &dist);
                     if (gotDistance)
                     {
+                        dist = ClipFloatToMinMax(dist, 0.0, 1.7);
                         self.distance = @(dist);
                     }
                 }
@@ -185,6 +195,7 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
                     BOOL gotSlopeWidth = GetCGFloatFromString(slopeWidth, &slopeW);
                     if (gotSlopeWidth)
                     {
+                        slopeW = ClipFloatToMinMax(slopeW, 0.0, 1.7);
                         self.slopeWidth = @(slopeW);
                     }
                 }
@@ -226,6 +237,9 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
             success &= GetCGFloatFromString(self.blueColour, &blue);
             if (success)
             {
+                red = ClipFloatToMinMax(red, 0.0, 1.0);
+                green = ClipFloatToMinMax(green, 0.0, 1.0);
+                blue = ClipFloatToMinMax(blue, 0.0, 1.0);
                 CIVector *vect = [[CIVector alloc] initWithX:red
                                                            Y:green
                                                            Z:blue

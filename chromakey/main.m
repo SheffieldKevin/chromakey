@@ -20,9 +20,6 @@
 //		P R O T O T Y P E S
 // ---------------------------------------------------------------------------
 
-// static void printNSString(NSString *string);
-// static void printArgs(int argc, const char **argv);
-
 // ---------------------------------------------------------------------------
 //		AVExporter Class Interface
 // ---------------------------------------------------------------------------
@@ -47,7 +44,7 @@
 @property (nonatomic, assign) CGContextRef cgContext; // Really retain.
 
 -(id)initWithArgs:(int)argc argv:(const char **)argv;
--(void)printUsage;
++(void)printUsage;
 -(CIFilter *)createCIFilter;
 -(CGContextRef)getCGContextWithWidth:(size_t)width height:(size_t)height;
 -(int)processFile:(NSURL *)fileURL;
@@ -77,9 +74,9 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     // Now redraw to the context with transparent black.
     CGContextSaveGState(context);
     CGColorRef tBlack = CGColorCreateGenericRGB(0.0, 0.0, 0.0, 0.0);
-    // CGColorGetConstantColor(kCGColorWhite);
     CGContextSetBlendMode(context, kCGBlendModeCopy);
     CGContextSetFillColorWithColor(context, tBlack);
+    CGColorRelease(tBlack);
     CGRect theRect = CGRectMake(0.0, 0.0, width, height);
     CGContextFillRect(context, theRect);
     CGContextRestoreGState(context);
@@ -109,6 +106,7 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     if (self)
     {
         self.exportType = @"public.png";
+        // self.exportType = @"public.tiff";
         // Processing the args goes here.
         BOOL gotRed = NO;
         BOOL gotGreen = NO;
@@ -128,75 +126,97 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
             
             if (!strcmp(args, "-source"))
             {
-                NSString *sourcePath = @(*argv++);
-                sourcePath = [sourcePath stringByExpandingTildeInPath];
-                BOOL isDir, fsObjectExists;
-                fsObjectExists = [[NSFileManager defaultManager]
-                                  fileExistsAtPath:sourcePath
-                                  isDirectory:&isDir];
-                if (fsObjectExists)
-                {
-                    NSURL *url = [[NSURL alloc] initFileURLWithPath:sourcePath];
-                    self.sourcePath = url;
-                    self.sourceDirectory = isDir;
-                    gotSource = YES;
-                }
                 argc--;
+                if (argc >= 0)
+                {
+                    NSString *sourcePath = @(*argv++);
+                    sourcePath = [sourcePath stringByExpandingTildeInPath];
+                    BOOL isDir, fsObjectExists;
+                    fsObjectExists = [[NSFileManager defaultManager]
+                                      fileExistsAtPath:sourcePath
+                                      isDirectory:&isDir];
+                    if (fsObjectExists)
+                    {
+                        NSURL *url;
+                        url = [[NSURL alloc] initFileURLWithPath:sourcePath];
+                        self.sourcePath = url;
+                        self.sourceDirectory = isDir;
+                        gotSource = YES;
+                    }
+                }
             }
             else if (!strcmp(args, "-destination"))
             {
-                NSString *destFold = @(*argv++);
-                destFold = [destFold stringByExpandingTildeInPath];
-                NSURL *destURL = [[NSURL alloc] initFileURLWithPath:destFold
-                                                        isDirectory:YES];
-                self.destinationFolder = destURL;
-                if (self.destinationFolder)
-                {
-                    gotDestination = YES;
-                }
                 argc--;
+                if (argc >= 0)
+                {
+                    NSString *destFold = @(*argv++);
+                    destFold = [destFold stringByExpandingTildeInPath];
+                    NSURL *destURL = [[NSURL alloc] initFileURLWithPath:destFold
+                                                            isDirectory:YES];
+                    self.destinationFolder = destURL;
+                    if (self.destinationFolder)
+                    {
+                        gotDestination = YES;
+                    }
+                }
             }
             else if (!strcmp(args, "-distance"))
             {
-                CGFloat dist;
-                NSString *distance = @(*argv++);
-                
-                BOOL gotDistance = GetCGFloatFromString(distance, &dist);
-                if (gotDistance)
-                {
-                    self.distance = @(dist);
-                }
                 argc--;
+                if (argc >= 0)
+                {
+                    CGFloat dist;
+                    NSString *distance = @(*argv++);
+                    
+                    BOOL gotDistance = GetCGFloatFromString(distance, &dist);
+                    if (gotDistance)
+                    {
+                        self.distance = @(dist);
+                    }
+                }
             }
             else if (!strcmp(args, "-slopewidth"))
             {
-                CGFloat slopeW;
-                NSString *slopeWidth = @(*argv++);
-                
-                BOOL gotSlopeWidth = GetCGFloatFromString(slopeWidth, &slopeW);
-                if (gotSlopeWidth)
-                {
-                    self.slopeWidth = @(slopeW);
-                }
                 argc--;
+                if (argc >= 0)
+                {
+                    CGFloat slopeW;
+                    NSString *slopeWidth = @(*argv++);
+                    
+                    BOOL gotSlopeWidth = GetCGFloatFromString(slopeWidth, &slopeW);
+                    if (gotSlopeWidth)
+                    {
+                        self.slopeWidth = @(slopeW);
+                    }
+                }
             }
             else if (!strcmp(args, "-red"))
             {
-                self.redColour = @(*argv++);
-                gotRed = YES;
                 argc--;
+                if (argc >= 0)
+                {
+                    self.redColour = @(*argv++);
+                    gotRed = YES;
+                }
             }
             else if (!strcmp(args, "-green"))
             {
-                self.greenColour = @(*argv++);
-                gotGreen = YES;
                 argc--;
+                if (argc >= 0)
+                {
+                    self.greenColour = @(*argv++);
+                    gotGreen = YES;
+                }
             }
             else if (!strcmp(args, "-blue"))
             {
-                self.blueColour = @(*argv++);
-                gotBlue = YES;
                 argc--;
+                if (argc >= 0)
+                {
+                    self.blueColour = @(*argv++);
+                    gotBlue = YES;
+                }
             }
         }
         if (gotRed && gotGreen && gotBlue)
@@ -216,7 +236,7 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
             }
             else
             {
-                red = blue = green = NO;
+                gotRed = gotBlue = gotGreen = NO;
             }
         }
         if (!(gotRed && gotBlue && gotGreen && gotDestination && gotSource))
@@ -226,11 +246,6 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
         }
     }
     return self;
-}
-
--(void)printUsage
-{
-    printf("To be implemented\n");
 }
 
 -(CGContextRef)getCGContextWithWidth:(size_t)width height:(size_t)height
@@ -264,7 +279,8 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     DrawTransparentBlackToContext(context, width, height);
 
     NSDictionary *ciContextOptions;
-    ciContextOptions = @{ kCIContextWorkingColorSpace : (__bridge id)colorSpace };
+    ciContextOptions = @{ kCIContextWorkingColorSpace : (__bridge id)colorSpace,
+                          kCIContextUseSoftwareRenderer : @NO };
     self.ciContext = [CIContext contextWithCGContext:self.cgContext
                                                    options:ciContextOptions];
     CFRelease(colorSpace);
@@ -320,6 +336,7 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     NSString *fileName = [fileURL lastPathComponent];
     fileName = [fileName stringByDeletingPathExtension];
     fileName = [fileName stringByAppendingPathExtension:@"png"];
+    // fileName = [fileName stringByAppendingPathExtension:@"tiff"];
     NSURL *outURL = [self.destinationFolder URLByAppendingPathComponent:fileName];
     
     // Get an already created graphic context or create a new one if necessary.
@@ -351,7 +368,10 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
                                          (__bridge CFURLRef)outURL,
                                          (__bridge CFStringRef)self.exportType,
                                          1, NULL);
-    CGImageDestinationAddImage(exporter, outCGImage, nil);
+    NSDictionary *options = @{ (__bridge id)
+                            kCGImageDestinationLossyCompressionQuality : @1.0 };
+    CGImageDestinationAddImage(exporter, outCGImage,
+                               (__bridge CFDictionaryRef)options);
     CGImageDestinationFinalize(exporter);
     CGImageRelease(outCGImage);
     CFRelease(exporter);
@@ -382,9 +402,12 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
         {
             for (NSURL *fileURL in filesInDir)
             {
-                // ignore result of processing file. Just because one file
-                // couldn't be processed doesn't mean the next can't.
-                [self processFile:fileURL];
+                @autoreleasepool
+                {
+                    // ignore result of processing file. Just because one file
+                    // couldn't be processed doesn't mean the next can't.
+                    [self processFile:fileURL];
+                }
             }
         }
     }
@@ -395,6 +418,29 @@ void DrawTransparentBlackToContext(CGContextRef context, size_t width,
     self.cgContext = nil;
     self.ciContext = nil;
     return result;
+}
+
++(void)printUsage
+{
+    printf("chromakey - usage:\n");
+    printf("Based on the specified chroma key color and the chroma key distance and slope width an alpha channel is added to the image.\n");
+    printf("The output file name is the same as the input file name, except for the file name extension which is replaced with png\n");
+	printf("	./chromakey [-parameter <value> ...]\n");
+	printf("	 parameters are all preceded by a -<parameterName>.  The order of the parameters is unimportant.\n");
+	printf("	 Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
+	printf("	 Available parameters are:\n");
+	printf("	 	-destination <outputFolderURL> The folder to export the new image file to.\n");
+	printf("	 	-source <sourceFile/Folder URL> The source file, or \n");
+    printf("	 	-red <X.X> The red color component value for the chroma key color. Range from 0.0 to 1.0\n");
+    printf("	 	-green <X.X> The green color component value for the chroma key color. Range from 0.0 to 1.0\n");
+    printf("	 	-blue <X.X> The blue color component value for the chroma key color. Range from 0.0 to 1.0\n");
+	printf("		-distance <X.X> The spread of the chroma key color. Optional. Default is 0.08. Range is from 0.0 to 1.0\n");
+	printf("	 	-slopewidth <X.X> The width of the slope in the when sliding from an alpa of 0.0 to an alpha of 1.0. Optional. Default 0.06. Range: 0.0 to 1.7\n");
+	printf("	Sample chromakey uses:\n");
+    printf("        A fairly wide range of colors near green that will be transparent. The small slopewidth means a sharp transition from transparent to opaque.\n");
+	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
+    printf("        Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width.\n");
+	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
 }
 
 @end
@@ -415,7 +461,7 @@ int main(int argc, const char * argv[])
                 result = [processor run];
             }
             else
-                printf("Failed to initialize\n");
+                [YVSChromaKeyImageProcessor printUsage];
         }
     }
     return result;

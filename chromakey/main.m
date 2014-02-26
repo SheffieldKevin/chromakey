@@ -113,7 +113,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     if (self)
     {
         self.exportType = @"public.png";
-        // self.exportType = @"public.tiff";
+
         // Processing the args goes here.
         BOOL gotRed = NO;
         BOOL gotGreen = NO;
@@ -305,7 +305,6 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     // Create the chroma key filter and set values.
     CIFilter *filter = [CIFilter filterWithName:@"YVSChromaKeyFilter"];
     [filter setValue:self.ciColourVector forKey:@"inputColor"];
-    [filter setValue:self.ciColourVector forKey:@"inputColor"];
     if (self.distance)
     {
         [filter setValue:self.distance forKey:@"inputDistance"];
@@ -347,8 +346,11 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     // Build the path to the file to be created.
     NSString *fileName = [fileURL lastPathComponent];
     fileName = [fileName stringByDeletingPathExtension];
-    fileName = [fileName stringByAppendingPathExtension:@"png"];
-    // fileName = [fileName stringByAppendingPathExtension:@"tiff"];
+    NSString *extension = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(
+                                (__bridge CFStringRef)self.exportType,
+                                                kUTTagClassFilenameExtension));
+    
+    fileName = [fileName stringByAppendingPathExtension:extension];
     NSURL *outURL = [self.destinationFolder URLByAppendingPathComponent:fileName];
     
     // Get an already created graphic context or create a new one if necessary.

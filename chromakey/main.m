@@ -459,8 +459,8 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
 	printf("	Sample chromakey uses:\n");
     printf("        A fairly wide range of colors near green that will be transparent. The small slopewidth means a sharp transition from transparent to opaque.\n");
 	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
-    printf("		Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width.\n");
-	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
+    printf("		Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width. Save as tiff.\n");
+	printf("	./chromakey -tiff -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
 }
 
 @end

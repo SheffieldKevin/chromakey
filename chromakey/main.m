@@ -112,7 +112,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     self = [super init];
     if (self)
     {
-        self.exportType = @"public.png";
+        self.exportType = @"public.png"; // defaults to png.
 
         // Processing the args goes here.
         BOOL gotRed = NO;
@@ -151,6 +151,10 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
                         gotSource = YES;
                     }
                 }
+            }
+            else if (!strcmp(args, "-tiff"))
+            {
+                self.exportType = @"public.tiff";
             }
             else if (!strcmp(args, "-destination"))
             {
@@ -450,6 +454,8 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     printf("		-blue <X.X> The blue color component value for the chroma key color. Range from 0.0 to 1.0\n");
 	printf("		-distance <X.X> The spread of the chroma key color. Optional. Default is 0.08. Range is from 0.0 to 1.0\n");
 	printf("		-slopewidth <X.X> The width of the slope in the when sliding from an alpa of 0.0 to an alpha of 1.0. Optional. Default 0.06. Range: 0.0 to 1.7\n");
+    printf("    Switches:\n");
+    printf("        -tiff The default image file format is public.png. Saving as tiff will create larger files, but will run faster.\n");
 	printf("	Sample chromakey uses:\n");
     printf("        A fairly wide range of colors near green that will be transparent. The small slopewidth means a sharp transition from transparent to opaque.\n");
 	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");

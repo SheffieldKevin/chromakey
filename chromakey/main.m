@@ -269,7 +269,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
         size_t origHeight = CGBitmapContextGetHeight(origContext);
         if (origWidth == width && origHeight == height)
         {
-            // Now redraw to the context with solid white.
+            // Now redraw to the context with transparent black.
             DrawTransparentBlackToContext(origContext, width, height);
             return origContext;
         }

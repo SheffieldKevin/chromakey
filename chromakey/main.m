@@ -444,8 +444,8 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     printf("chromakey - usage:\n");
     printf("Based on the specified chroma key color and the chroma key distance and slope width an alpha channel is added to the image.\n");
     printf("The output file name is the same as the input file name, except for the file name extension which is replaced with png\n");
-	printf("	./chromakey [-parameter <value> ...]\n");
-	printf("	parameters are all preceded by a -<parameterName>.  The order of the parameters is unimportant.\n");
+	printf("	./chromakey [-parameter <value> ...] [-switch]\n");
+	printf("	parameters are preceded by a -<parameterName>.  The order of the parameters is unimportant. There's one switch.\n");
 	printf("	Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
 	printf("	Available parameters are:\n");
 	printf("		-destination <outputFolderURL> The folder to export the new image file to.\n");

@@ -183,7 +183,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
                     BOOL gotDistance = GetCGFloatFromString(distance, &dist);
                     if (gotDistance)
                     {
-                        dist = ClipFloatToMinMax(dist, 0.0, 1.7);
+                        dist = ClipFloatToMinMax(dist, 0.0, 1.0);
                         self.distance = @(dist);
                     }
                 }
@@ -199,7 +199,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
                     BOOL gotSlopeWidth = GetCGFloatFromString(slopeWidth, &slopeW);
                     if (gotSlopeWidth)
                     {
-                        slopeW = ClipFloatToMinMax(slopeW, 0.0, 1.7);
+                        slopeW = ClipFloatToMinMax(slopeW, 0.0, 1.0);
                         self.slopeWidth = @(slopeW);
                     }
                 }
@@ -308,6 +308,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
 {
     // Create the chroma key filter and set values.
     CIFilter *filter = [CIFilter filterWithName:@"YVSChromaKeyFilter"];
+    [filter setDefaults];
     [filter setValue:self.ciColourVector forKey:@"inputColor"];
     if (self.distance)
     {

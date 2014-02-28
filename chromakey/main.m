@@ -441,27 +441,29 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
 
 +(void)printUsage
 {
+    printf("Add to image transparency based on a chroma key color, color difference and slope width.\n\n");
     printf("chromakey - usage:\n");
-    printf("Based on the specified chroma key color and the chroma key distance and slope width an alpha channel is added to the image.\n");
+    printf("Based on a chroma key color and the distance and slope width transparency is added to the image.\n");
     printf("The output file name is the same as the input file name, except for the file name extension which is replaced with png\n");
-	printf("	./chromakey [-parameter <value> ...] [-switch]\n");
-	printf("	parameters are preceded by a -<parameterName>.  The order of the parameters is unimportant. There's one switch.\n");
-	printf("	Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
-	printf("	Available parameters are:\n");
-	printf("		-destination <outputFolderURL> The folder to export the new image file to.\n");
-	printf("		-source <sourceFile/Folder URL> The source file, or \n");
-    printf("		-red <X.X> The red color component value for the chroma key color. Range from 0.0 to 1.0\n");
-    printf("		-green <X.X> The green color component value for the chroma key color. Range from 0.0 to 1.0\n");
-    printf("		-blue <X.X> The blue color component value for the chroma key color. Range from 0.0 to 1.0\n");
-	printf("		-distance <X.X> The spread of the chroma key color. Optional. Default is 0.08. Range is from 0.0 to 1.0\n");
-	printf("		-slopewidth <X.X> The width of the slope in the when sliding from an alpa of 0.0 to an alpha of 1.0. Optional. Default 0.06. Range: 0.0 to 1.7\n");
+	printf("    ./chromakey [-parameter <value> ...] [-switch]\n");
+	printf("    parameters are preceded by a -<parameterName>.  The order of the parameters is unimportant. There's one switch.\n");
+	printf("    Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
+	printf("    Required parameters:\n");
+	printf("        -destination <outputFolderURL> The folder to export the new image file to.\n");
+	printf("        -source <sourceFile/Folder URL> The source file, or folder containing images.\n");
+    printf("        -red <X.X> The red color component value for the chroma key color. Range: 0.0 to 1.0\n");
+    printf("        -green <X.X> The green color component value for the chroma key color. Range: 0.0 to 1.0\n");
+    printf("        -blue <X.X> The blue color component value for the chroma key color. Range: 0.0 to 1.0\n");
+    printf("    Optional parameters:\n");
+	printf("        -distance <X.X> The spread of the chroma key color. Default is 0.08. Range: 0.0 to 1.0\n");
+	printf("        -slopewidth <X.X> The width of the slope when sliding from alpha 0.0 to 1.0. Default 0.06. Range: 0.0 to 1.0\n");
     printf("    Switches:\n");
-    printf("        -tiff The default image file format is public.png. Saving as tiff will create larger files, but will run faster.\n");
-	printf("	Sample chromakey uses:\n");
-    printf("        A fairly wide range of colors near green that will be transparent. The small slopewidth means a sharp transition from transparent to opaque.\n");
-	printf("	./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
-    printf("		Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width. Save as tiff.\n");
-	printf("	./chromakey -tiff -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
+    printf("        -tiff Save as tiff, default is png. Saving as tiff will create larger files, but will run faster.\n");
+	printf("    Sample chromakey uses:\n");
+    printf("        A fairly wide range of colors near green that will be transparent. A small slopewidth means a sharp transition from transparent to opaque.\n");
+	printf("            ./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
+    printf("        Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width. Save as tiff.\n");
+	printf("	        ./chromakey -tiff -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
 }
 
 @end
@@ -471,19 +473,15 @@ int main(int argc, const char * argv[])
     int result = -1;
     @autoreleasepool
     {
-        //	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-        @autoreleasepool
+        YVSChromaKeyImageProcessor* processor;
+        processor = [[YVSChromaKeyImageProcessor alloc] initWithArgs:argc
+                                                                argv:argv];
+        if (processor)
         {
-            YVSChromaKeyImageProcessor* processor;
-            processor = [[YVSChromaKeyImageProcessor alloc] initWithArgs:argc
-                                                                    argv:argv];
-            if (processor)
-            {
-                result = [processor run];
-            }
-            else
-                [YVSChromaKeyImageProcessor printUsage];
+            result = [processor run];
         }
+        else
+            [YVSChromaKeyImageProcessor printUsage];
     }
     return result;
 }

@@ -3,7 +3,20 @@ chromakey
 
 A custom chroma key Core Image Filter (CIFilter) built into a command line tool.
 
-Add to image transparency based on a chroma key color, color difference and slope width.
+=== Uses ===
+
+Objective-C, Cocoa, OS X, CoreImage.
+
+=== Produced ===
+
+A command line tool "chromakey", Custom core image filter "YVSChromaKeyFilter" that inherits from CIFilter and implements its own custom kernel.
+
+=== Requirements ===
+10.9, Xcode 5.0.1.
+
+The following is a print usage output produced if you call the command line tool without any parameters.
+
+	Add to image transparency based on a chroma key color, color difference and slope width.
 
 	chromakey - usage:
 	Based on a chroma key color and the distance and slope width transparency is added to the image.

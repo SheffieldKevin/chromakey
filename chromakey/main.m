@@ -10,16 +10,16 @@
 #import "YVSChromaKeyFilter.h"
 
 // ---------------------------------------------------------------------------
-//		S W I T C H E S
+//        S W I T C H E S
 // ---------------------------------------------------------------------------
 
 
 // ---------------------------------------------------------------------------
-//		P R O T O T Y P E S
+//        P R O T O T Y P E S
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//		YVSChromaKeyImageProcessor Class Interface
+//        YVSChromaKeyImageProcessor Class Interface
 // ---------------------------------------------------------------------------
 @interface YVSChromaKeyImageProcessor : NSObject
 {
@@ -445,25 +445,25 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     printf("chromakey - usage:\n");
     printf("Based on a chroma key color and the distance and slope width transparency is added to the image.\n");
     printf("The output file name is the same as the input file name, except for the file name extension which is replaced with png\n");
-	printf("    ./chromakey [-parameter <value> ...] [-switch]\n");
-	printf("    parameters are preceded by a -<parameterName>.  The order of the parameters is unimportant. There's one switch.\n");
-	printf("    Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
-	printf("    Required parameters:\n");
-	printf("        -destination <outputFolderURL> The folder to export the new image file to.\n");
-	printf("        -source <sourceFile/Folder URL> The source file, or folder containing images.\n");
+    printf("    ./chromakey [-parameter <value> ...] [-switch]\n");
+    printf("    parameters are preceded by a -<parameterName>.  The order of the parameters is unimportant. There's one switch.\n");
+    printf("    Required parameters are -source <sourceFile/Folder URL> -destination <outputFolderURL> -red <X.X> -green <X.X> -blue <X.X> \n");
+    printf("    Required parameters:\n");
+    printf("        -destination <outputFolderURL> The folder to export the new image file to.\n");
+    printf("        -source <sourceFile/Folder URL> The source file, or folder containing images.\n");
     printf("        -red <X.X> The red color component value for the chroma key color. Range: 0.0 to 1.0\n");
     printf("        -green <X.X> The green color component value for the chroma key color. Range: 0.0 to 1.0\n");
     printf("        -blue <X.X> The blue color component value for the chroma key color. Range: 0.0 to 1.0\n");
     printf("    Optional parameters:\n");
-	printf("        -distance <X.X> The spread of the chroma key color. Default is 0.08. Range: 0.0 to 1.0\n");
-	printf("        -slopewidth <X.X> The width of the slope when sliding from alpha 0.0 to 1.0. Default 0.06. Range: 0.0 to 1.0\n");
+    printf("        -distance <X.X> The spread of the chroma key color. Default is 0.08. Range: 0.0 to 1.0\n");
+    printf("        -slopewidth <X.X> The width of the slope when sliding from alpha 0.0 to 1.0. Default 0.06. Range: 0.0 to 1.0\n");
     printf("    Switches:\n");
     printf("        -tiff Save as tiff, default is png. Saving as tiff will create larger files, but will run faster.\n");
-	printf("    Sample chromakey uses:\n");
+    printf("    Sample chromakey uses:\n");
     printf("        A fairly wide range of colors near green that will be transparent. A small slopewidth means a sharp transition from transparent to opaque.\n");
-	printf("            ./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
+    printf("            ./chromakey -source ~/Pictures -destination ~/Desktop/junkimages -red 0.0 -green 1.0 -blue 0.0 -distance 0.2 -slopewidth 0.02\n");
     printf("        Make dark greys transparent and a gradual transition from transparent to opaque with a larger slope width. Save as tiff.\n");
-	printf("	        ./chromakey -tiff -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
+    printf("            ./chromakey -tiff -source ~/Pictures -destination ~/Desktop/junkimages -red 0.2 -green 0.2 -blue 0.2 -distance 0.08 -slopewidth 0.2\n");
 }
 
 @end

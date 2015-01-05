@@ -75,39 +75,39 @@ static CIKernel *chromaKeyKernel;
 
 -(id)init
 {
-	self = [super init];
-	
-	if (self)
-	{
-		self->inputColor = YVSChromaKeyFilterDefaultInputColor;
+    self = [super init];
+    
+    if (self)
+    {
+        self->inputColor = YVSChromaKeyFilterDefaultInputColor;
         self->inputDistance = YVSChromaKeyFilterDefaultInputDistance;
         self->inputSlopeWidth = YVSChromaKeyFilterDefaultInputSlopeWidth;
-	}
-	
-	return self;
+    }
+    
+    return self;
 }
 
 - (CIImage *)outputImage
 {
-	NSParameterAssert(inputImage != nil &&
+    NSParameterAssert(inputImage != nil &&
                       [inputImage isKindOfClass:[CIImage class]]);
-	NSParameterAssert(inputColor != nil &&
+    NSParameterAssert(inputColor != nil &&
                       [inputColor isKindOfClass:[CIVector class]]);
-	NSParameterAssert(inputDistance != nil &&
+    NSParameterAssert(inputDistance != nil &&
                       [inputDistance isKindOfClass:[NSNumber class]]);
-	NSParameterAssert(inputSlopeWidth != nil &&
+    NSParameterAssert(inputSlopeWidth != nil &&
                       [inputSlopeWidth isKindOfClass:[NSNumber class]]);
-	
-	// Create output image by applying chroma key filter.
-	CIImage *outputImage;
+    
+    // Create output image by applying chroma key filter.
+    CIImage *outputImage;
     
     outputImage = [self apply:chromaKeyKernel,
-							[CISampler samplerWithImage:inputImage],
-							self->inputColor, inputDistance, inputSlopeWidth,
-							kCIApplyOptionDefinition, [inputImage definition],
-							nil];
-	
-	return outputImage;
+                            [CISampler samplerWithImage:inputImage],
+                            self->inputColor, inputDistance, inputSlopeWidth,
+                            kCIApplyOptionDefinition, [inputImage definition],
+                            nil];
+    
+    return outputImage;
 }
 
 - (NSDictionary *)customAttributes
@@ -127,7 +127,7 @@ static CIKernel *chromaKeyKernel;
                   kCIAttributeDefault : YVSChromaKeyFilterDefaultInputSlopeWidth,
                      kCIAttributeType : kCIAttributeTypeDistance };
 
-	return @{ kCIInputColorKey : inputColorProps,
+    return @{ kCIInputColorKey : inputColorProps,
               @"inputDistance" : inputDistanceProps,
             @"inputSlopeWidth" : inputSlopeWidthProps };
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E3573F61B42DA0800BB9F40 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E3573F51B42DA0800BB9F40 /* main.m */; };
 		6EB5603B18B650810053019B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EB5603A18B650810053019B /* Foundation.framework */; };
 		6EB5603E18B650810053019B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6EB5603D18B650810053019B /* main.m */; };
 		6EB5604218B650810053019B /* chromakey.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6EB5604118B650810053019B /* chromakey.1 */; };
@@ -14,6 +15,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		6E3573F11B42DA0800BB9F40 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		6EB5603518B650810053019B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -27,6 +37,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6E3573F31B42DA0800BB9F40 /* perspectivefilter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = perspectivefilter; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E3573F51B42DA0800BB9F40 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6EB5603718B650810053019B /* chromakey */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = chromakey; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EB5603A18B650810053019B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6EB5603D18B650810053019B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -37,6 +49,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6E3573F01B42DA0800BB9F40 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6EB5603418B650810053019B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,10 +67,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6E3573F41B42DA0800BB9F40 /* perspectivefilter */ = {
+			isa = PBXGroup;
+			children = (
+				6E3573F51B42DA0800BB9F40 /* main.m */,
+			);
+			path = perspectivefilter;
+			sourceTree = "<group>";
+		};
 		6EB5602E18B650810053019B = {
 			isa = PBXGroup;
 			children = (
 				6EB5603C18B650810053019B /* chromakey */,
+				6E3573F41B42DA0800BB9F40 /* perspectivefilter */,
 				6EB5603918B650810053019B /* Frameworks */,
 				6EB5603818B650810053019B /* Products */,
 			);
@@ -61,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				6EB5603718B650810053019B /* chromakey */,
+				6E3573F31B42DA0800BB9F40 /* perspectivefilter */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,6 +125,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6E3573F21B42DA0800BB9F40 /* perspectivefilter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6E3573F71B42DA0800BB9F40 /* Build configuration list for PBXNativeTarget "perspectivefilter" */;
+			buildPhases = (
+				6E3573EF1B42DA0800BB9F40 /* Sources */,
+				6E3573F01B42DA0800BB9F40 /* Frameworks */,
+				6E3573F11B42DA0800BB9F40 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = perspectivefilter;
+			productName = perspectivefilter;
+			productReference = 6E3573F31B42DA0800BB9F40 /* perspectivefilter */;
+			productType = "com.apple.product-type.tool";
+		};
 		6EB5603618B650810053019B /* chromakey */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6EB5604518B650810053019B /* Build configuration list for PBXNativeTarget "chromakey" */;
@@ -121,6 +167,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Kevin Meaney";
+				TargetAttributes = {
+					6E3573F21B42DA0800BB9F40 = {
+						CreatedOnToolsVersion = 6.3;
+					};
+				};
 			};
 			buildConfigurationList = 6EB5603218B650810053019B /* Build configuration list for PBXProject "chromakey" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -135,11 +186,20 @@
 			projectRoot = "";
 			targets = (
 				6EB5603618B650810053019B /* chromakey */,
+				6E3573F21B42DA0800BB9F40 /* perspectivefilter */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6E3573EF1B42DA0800BB9F40 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E3573F61B42DA0800BB9F40 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6EB5603318B650810053019B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -152,6 +212,38 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		6E3573F81B42DA0800BB9F40 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6E3573F91B42DA0800BB9F40 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		6EB5604318B650810053019B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -186,7 +278,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.10;
 			};
 			name = Debug;
 		};
@@ -218,7 +310,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.10;
 			};
 			name = Release;
 		};
@@ -243,6 +335,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6E3573F71B42DA0800BB9F40 /* Build configuration list for PBXNativeTarget "perspectivefilter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E3573F81B42DA0800BB9F40 /* Debug */,
+				6E3573F91B42DA0800BB9F40 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		6EB5603218B650810053019B /* Build configuration list for PBXProject "chromakey" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -259,6 +359,7 @@
 				6EB5604718B650810053019B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

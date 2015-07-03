@@ -200,16 +200,16 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
 -(CIFilter *)createCIFilter
 {
     // Create the perspective transform filter and set values.
-    CIFilter *filter = [CIFilter filterWithName:@"CIPerspectiveTransformExtent"];
+    CIFilter *filter = [CIFilter filterWithName:@"CIPerspectiveTransform"];
     [filter setDefaults];
     
-    [filter setValue:@"[400 850]" forKey:@"inputTopLeft"];
-    [filter setValue:@"[500 800]" forKey:@"inputTopRight"];
+    [filter setValue:@"[470 850]" forKey:@"inputTopLeft"];
+    [filter setValue:@"[530 800]" forKey:@"inputTopRight"];
 
-    [filter setValue:@"[400 150]" forKey:@"inputBottomLeft"];
-    [filter setValue:@"[500 200]" forKey:@"inputBottomRight"];
+    [filter setValue:@"[470 150]" forKey:@"inputBottomLeft"];
+    [filter setValue:@"[530 200]" forKey:@"inputBottomRight"];
     
-    [filter setValue:@"[0 0 1000 1000]" forKey:@"inputExtent"];
+    // [filter setValue:@"[0 0 1000 1000]" forKey:@"inputExtent"];
     
     return filter;
 }
@@ -280,9 +280,9 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     // The image should be in my context now, so I should create image from context
     CGImageRef outCGImage = CGBitmapContextCreateImage(context);
     CGImageDestinationRef exporter = CGImageDestinationCreateWithURL(
-                                                                     (__bridge CFURLRef)outURL,
-                                                                     (__bridge CFStringRef)self.exportType,
-                                                                     1, NULL);
+                                                 (__bridge CFURLRef)outURL,
+                                                 (__bridge CFStringRef)self.exportType,
+                                                 1, NULL);
     NSDictionary *options = @{ (__bridge id)
                                kCGImageDestinationLossyCompressionQuality : @1.0 };
     CGImageDestinationAddImage(exporter, outCGImage,
@@ -307,9 +307,9 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
     if (self.isSourceDirectory)
     {
         NSArray *filesInDir = [manager contentsOfDirectoryAtURL:self.sourcePath
-                                     includingPropertiesForKeys:nil
-                                                        options:NSDirectoryEnumerationSkipsHiddenFiles
-                                                          error:nil];
+                         includingPropertiesForKeys:nil
+                                            options:NSDirectoryEnumerationSkipsHiddenFiles
+                                              error:nil];
         if (filesInDir)
         {
             for (NSURL *fileURL in filesInDir)
@@ -334,7 +334,7 @@ CGFloat ClipFloatToMinMax(CGFloat in, CGFloat min, CGFloat max)
 
 +(void)printUsage
 {
-    printf("Add to image transparency based on a chroma key color, color difference and slope width.\n\n");
+    printf("Apply a perspective transform filter to images.\n\n");
     printf("perspectivefilter - usage:\n");
     printf("The output file name is the same as the input file name, except for the file name extension which is replaced with png\n");
     printf("    ./perspectivefilter [-parameter <value> ...] [-switch]\n");
